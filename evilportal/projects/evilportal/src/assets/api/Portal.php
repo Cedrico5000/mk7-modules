@@ -39,7 +39,7 @@ abstract class Portal
      */
     protected final function notify($message)
     {
-        $this->execBackground("notify {$message}");
+        $this->execBackground("PYTHONPATH=/usr/lib/pineapple; export PYTHONPATH; /usr/bin/python3 /usr/bin/notify info '{$message}' evilportal");
     }
 
     /**
@@ -81,15 +81,15 @@ abstract class Portal
      */
     protected function handleAuthorization()
     {
-        if (isset($this->request->target)) {
-            $this->authorizeClient($_SERVER['REMOTE_ADDR']);
-            $this->onSuccess();
+        if ($this->isClientAuthorized($_SERVER['REMOTE_ADDR']) and isset($this->request->target)) {
             $this->redirect();
-        } elseif ($this->isClientAuthorized($_SERVER['REMOTE_ADDR'])) {
-            $this->redirect();
-        } else {
-            $this->showError();
-        }
+         } elseif (isset($this->request->target)) {
+             $this->authorizeClient($_SERVER['REMOTE_ADDR']);
+             $this->onSuccess();
+             $this->redirect();
+         } else {
+             $this->showError();
+         } 
     }
 
     /**
